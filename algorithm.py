@@ -2,6 +2,10 @@ import copy
 import numpy as np
 from collections import Counter
 
+def accuracy(y_true, y_pred):
+    acc = np.sum(y_true==y_pred)/len(y_true)
+    return acc
+
 class KNN_scratch(object):
 
     def __init__(self, k=3):
@@ -71,7 +75,7 @@ class NaiveBayes_scratch(object):
         denominator = np.sqrt(2*np.pi*var)
         return numerator/denominator
 
-class LinearRegression_scratch(object):
+class LinearRegression_GD(object):
 
     def __init__(self, n_iters = 1500, lr=0.01):
         self.n_iters = n_iters
@@ -109,48 +113,56 @@ class LinearRegression_scratch(object):
             y_pred[i] = np.dot(X_pred[i], self.weight) +self.bias
         return y_pred
 
+class LinearRegression_NE(object):
+
+    def __init__(self):
+        self.theta = None
+
+    def fit(self, X, y):
+        m, n = X.shape
+        X_b = np.c_[np.ones((m,n)), X]
+        self.theta = np.linalg.inv(np.dot(X_b.T, X_b)).dot(X_b.T).dot(y)
+        return None
+
+    def predict(self,X_pred):
+        m, n = X_pred.shape
+        X_pred_b = np.c_[np.ones((m,n)), X_pred]
+        y_pred = np.dot(X_pred_b, self.theta)
+
+        return y_pred
+
+
 class LogisticRegression_scratch(object):
 
-    def __init__(self, n_iter=1500, lr=0.01):
-        self.n_iter = n_iter
-        self.bias = -8
-        self.weight = 0.01*(np.random.rand(2).reshape(-1,1)-0.5)
-        self.dj_dw = self.weight.shape
-        self.dj_db = 0.
+    def __init__(self, n_iters = 1500, lr=0.01):
+        self.n_iters = n_iters
         self.lr = lr
+        self.weight = None
+        self.bias = 0
 
     @staticmethod
     def sigmoid(z):
         return 1/(1+np.exp(-z))
 
-    def compute_gradient(self, X, y):
+    def fit(self, X, y):
         m, n = X.shape
+        self.weight = np.zeros(n)
 
-        for i in range(m):
-            f_wb_i = self.sigmoid(np.dot(X[i], self.weight) + self.bias)
-            err = f_wb_i -y[i]
+        for _ in range(self.n_iters):
+            f_wb = self.sigmoid(np.dot(X, self.weight)+self.bias)
 
-            for j in range(n):
-                self.dj_dw[j] = self.dj_dw[j] + err*X[i,j]
-            self.dj_db = self.dj_db + err
-        self.dj_dw = self.dj_dw/m
-        self.dj_db = self.dj_db/m
+            dw = np.dot(X.T, (f_wb-y))/m
+            db = np.sum(f_wb-y)/m
 
+            self.weight -= self.lr*dw
+            self.bias -= self.lr*db
         return None
 
-    def fit(self, X, y):
-        self.compute_gradient(X, y)
+    def predict(self, X):
 
-        for _ in range(self.n_iter):
-            self.weight = self.weight - self.lr*self.dj_dw
-            self.bias = self.bias - self.lr*self.dj_db
+        f_wb = self.sigmoid(np.dot(X, self.weight) + self.bias)
+        y_pred = np.array([1 if i >0.5 else 0 for i in f_wb])
+        return y_pred
 
-    def predict(self, X_pred):
-        m, n = X_pred.shape
-        pred = np.zeros(m)
-
-        for i in range(m):
-            f_wb_i = self.sigmoid(np.dot(X_pred[i], self.weight) + self.bias)
-            pred[i] = f_wb_i > 0.5
-
-        return pred
+class DecisionTree_scratch(object):
+    pass
