@@ -76,6 +76,7 @@ class NaiveBayes_scratch(object):
         denominator = np.sqrt(2*np.pi*var)
         return numerator/denominator
 
+# Gradient descent for linear regression
 class LinearRegression_GD(object):
 
     def __init__(self, n_iters = 1500, lr=0.01):
@@ -114,6 +115,7 @@ class LinearRegression_GD(object):
             y_pred[i] = np.dot(X_pred[i], self.weight) +self.bias
         return y_pred
 
+# Normal Equation for linear regression
 class LinearRegression_NE(object):
 
     def __init__(self):
