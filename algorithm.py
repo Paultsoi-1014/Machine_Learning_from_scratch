@@ -221,3 +221,7 @@ class LinearSVC_scratch(object):
     def predict(self, X_pred):
         f_wb = np.dot(X_pred, self.weight) + self.bias
         return np.sign(f_wb)
+
+
+
+
