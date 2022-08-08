@@ -21,10 +21,10 @@ class KNN_scratch(object):
         self.y_train = y
 
     def predict(self, X):
-        predicted_labels = [self._predict(x) for x in X]
+        predicted_labels = [self.predict_compute(x) for x in X]
         return np.array(predicted_labels)
 
-    def _predict(self,x):
+    def predict_compute(self,x):
         # Compute distance
         distance = [self.euclidean_distance(x, X_train) for X_train in self.X_train]
 
@@ -55,21 +55,21 @@ class NaiveBayes_scratch(object):
             self._priors[c] = X_c.shape[0]/float(n_samples) # Calculate the prior probability
 
     def predict(self, X):
-        y_pred = [self._predict(x) for x in X]
+        y_pred = [self.predict_compute(x) for x in X]
         return y_pred
 
-    def _predict(self, x):
+    def predict_compute(self, x):
         posteriors = []
 
         for idx, c in enumerate(self._classes):
             prior = self._priors[idx]
-            class_conditional = np.sum(np.log(self._pdf(idx, x)))
+            class_conditional = np.sum(np.log(self.pdf(idx, x)))
             posterior = prior + class_conditional
             posteriors.append(posterior)
 
         return self._classes[np.argmax(posteriors)]
 
-    def _pdf(self, class_idx, x):
+    def pdf(self, class_idx, x):
         mean = self._mean[class_idx]
         var = self._var[class_idx]
         numerator = np.exp(-(x-mean)**2/(2*var))
@@ -87,7 +87,7 @@ class LinearRegression_GD(object):
         self.weight = 0
         self.bias = 0
 
-    def _compute_gradient(self, X, y):
+    def compute_gradient(self, X, y):
         m = X.shape[0]
 
         for i in range(m):
@@ -102,7 +102,7 @@ class LinearRegression_GD(object):
     def fit(self, X, y):
 
         for _ in range(self.n_iters):
-            self._compute_gradient(X, y)
+            self.compute_gradient(X, y)
             self.weight = self.weight - self.lr*self.dj_dw
             self.bias = self.bias - self.lr*self.dj_db
         return None
@@ -133,7 +133,6 @@ class LinearRegression_NE(object):
         y_pred = np.dot(X_pred_b, self.theta)
 
         return y_pred
-
 
 class LogisticRegression_scratch(object):
 
@@ -167,5 +166,41 @@ class LogisticRegression_scratch(object):
         y_pred = np.array([1 if i >0.5 else 0 for i in f_wb])
         return y_pred
 
-class DecisionTree_scratch(object):
-    pass
+class perceptron_scratch(object):
+    def __init__(self, n_iters = 1500, lr=0.001):
+        self.n_iters = n_iters
+        self.lr = lr
+        self.weight = None
+        self.bias = 0
+
+    def fit(self, X, y):
+        self.weight = np.zeros(X.shape[1])
+
+        for _ in range(self.n_iters):
+            for x_i, y_i in zip(X, y):
+                y_pred = self.predict(x_i)
+                delta_w = self.lr*(y_i-y_pred)
+
+                self.weight += delta_w*x_i # w:=w+delta_w
+                self.bias += delta_w
+        return None
+
+    def predict(self, X_pred): # y=g(f(w,b)) = g(w.T*x+b)
+        f_wb = np.dot(X_pred, self.weight) + self.bias
+        y_pred = self.unit_step_function(f_wb)
+        return y_pred
+
+    def unit_step_function(self,x):
+        return np.where(x>=0, 1, 0)
+
+class SVM(object):
+    def __init__(self, n_iters= 1500, lr=0.001, lambda_=0.01):
+        self.n_iters = n_iters
+        self.lr = lr
+        self.lambda_ = lambda_
+
+    def fit(self, X, y):
+        pass
+
+    def predict(self, X_pred):
+        pass
