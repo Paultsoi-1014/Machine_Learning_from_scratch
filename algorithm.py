@@ -194,7 +194,7 @@ class perceptron_scratch(object):
         return np.where(x>=0, 1, 0)
 
 class LinearSVC_scratch(object):
-    def __init__(self, n_iters= 1500, lr=0.001, lambda_=0.01):
+    def __init__(self, n_iters= 1500, lr=0.001, lambda_=0.0001):
         self.n_iters = n_iters
         self.lr = lr
         self.lambda_ = lambda_
