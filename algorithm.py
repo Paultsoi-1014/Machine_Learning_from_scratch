@@ -79,7 +79,7 @@ class NaiveBayes_scratch(object):
 # Gradient descent for linear regression
 class LinearRegression_GD(object):
 
-    def __init__(self, n_iters = 1500, lr=0.01):
+    def __init__(self, n_iters = 1500, lr=0.001):
         self.n_iters = n_iters
         self.lr = lr
         self.dj_dw = 0
@@ -193,14 +193,31 @@ class perceptron_scratch(object):
     def unit_step_function(self,x):
         return np.where(x>=0, 1, 0)
 
-class SVM(object):
+class LinearSVC_scratch(object):
     def __init__(self, n_iters= 1500, lr=0.001, lambda_=0.01):
         self.n_iters = n_iters
         self.lr = lr
         self.lambda_ = lambda_
+        self.weight = None
+        self.bias = 0
 
     def fit(self, X, y):
-        pass
+        _, n = X.shape
+        self.weight = np.zeros(n)
+
+        for _ in range(self.n_iters):
+            for idx, x_i in enumerate(X):
+                cond = y[idx]*np.dot(self.weight, x_i) >=1
+
+                if cond:
+                    self.weight -= self.lr*(self.lambda_*self.weight)
+                    self.bias -= self.lr*0
+                else:
+                    self.weight -= self.lr*(self.lambda_*self.weight-y[idx]*x_i)
+                    self.bias -= self.lr*y[idx]
+
+        return None
 
     def predict(self, X_pred):
-        pass
+        f_wb = np.dot(X_pred, self.weight) + self.bias
+        return np.sign(f_wb)
